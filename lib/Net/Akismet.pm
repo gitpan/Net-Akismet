@@ -14,7 +14,7 @@ use integer;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION	= '0.01';
+our $VERSION	= '0.02';
 
 my $UA_SUFFIX	= "Akismet Perl/$VERSION";
 
@@ -24,7 +24,7 @@ my $UA_SUFFIX	= "Akismet Perl/$VERSION";
 			KEY => 'secret-baba-API-key',
 			URL => 'http://example.blog.net/',
 		) or die('Key verification failure!');
-	
+
 	my $verdict = $akismet->check(
 			USER_IP 		=> '10.10.10.11',
 			COMMENT_CONTENT		=> 'Run, Lola, Run, the spam will catch you!',
@@ -37,7 +37,7 @@ my $UA_SUFFIX	= "Akismet Perl/$VERSION";
 
 		print "I found spam. I am a spam-founder!\n";
 	}
-		
+
 =head1 METHODS
 
 =over 8
@@ -47,7 +47,7 @@ my $UA_SUFFIX	= "Akismet Perl/$VERSION";
 	Net::Akismet->new(PARAM => ...);
 
 Acceptable parameters:
-	
+
 =over 4
 
 =item  KEY
@@ -61,7 +61,7 @@ The front page or home URL of the instance making the request.  For a blog or wi
 =item  USER_AGENT
 
 If supplied the value is prepended to this module's identification string to become something like:
-	
+
 	yourkillerapp/0.042 | Akismet Perl/0.01
 
 Otherwise just Akismet Perl's user agent string will be sent.
@@ -261,6 +261,6 @@ Copyright (C) 2006 by Nikolay Bachiyski
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, any later version of Perl 5 you may have available.
 
-$Id: Akismet.pm 16 2006-01-11 14:20:21Z humperdink $
+$Id: Akismet.pm 28 2006-07-02 20:35:17Z humperdink $
 
 =cut
