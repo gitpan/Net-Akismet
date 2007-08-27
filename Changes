@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Akismet.
 
+0.03  Mon Aug 27 10:28:28 EEST 2007
+	- proper user agent handling, patch by John Belmonte, rt bug #28939
+
 0.02  Sun Jul 2 23:12:27 2006
 	- fixed install problems with perl <5.8.4
 	- some new test added (thanks to Peter Pentchev)
@@ -8,4 +11,4 @@ Revision history for Perl extension Net::Akismet.
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n Net::Akismet
 
-$Id: Changes 28 2006-07-02 20:35:17Z humperdink $
+$Id: Changes 33 2007-08-27 07:30:07Z humperdink $

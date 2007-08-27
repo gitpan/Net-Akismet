@@ -14,9 +14,9 @@ use integer;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION	= '0.02';
+our $VERSION	= '0.03';
 
-my $UA_SUFFIX	= "Akismet Perl/$VERSION";
+my $UA_SUFFIX	= "Perl-Net-Akismet/$VERSION";
 
 =head1 SYNOPSIS
 
@@ -27,6 +27,7 @@ my $UA_SUFFIX	= "Akismet Perl/$VERSION";
 
 	my $verdict = $akismet->check(
 			USER_IP 		=> '10.10.10.11',
+			USER_AGENT 		=> 'Mozilla/5.0',
 			COMMENT_CONTENT		=> 'Run, Lola, Run, the spam will catch you!',
 			COMMENT_AUTHOR		=> 'dosser',
 			COMENT_AUTHOR_EMAIL	=> 'dosser@subway.de',
@@ -62,7 +63,7 @@ The front page or home URL of the instance making the request.  For a blog or wi
 
 If supplied the value is prepended to this module's identification string to become something like:
 
-	yourkillerapp/0.042 | Akismet Perl/0.01
+	your-killer-app/0.042 Perl-Net-Akismet/0.01 libwww-perl/5.8
 
 Otherwise just Akismet Perl's user agent string will be sent.
 
@@ -85,9 +86,10 @@ sub new {
 	my $key 	= $self->{KEY} or return undef;
 	my $url		= $self->{URL} or return undef;
 
-	my $agent = $params{USER_AGENT}? "$params{USER_AGENT} | " : '';
-
-	$self->{ua}->agent($agent.$UA_SUFFIX);
+	# NOTE: trailing space leaves LWP::UserAgent agent string in place
+	my $agent = "$UA_SUFFIX ";
+	$agent = "$params{USER_AGENT} $agent" if $params{USER_AGENT};
+	$self->{ua}->agent($agent);
 
 	bless $self, $class;
 
@@ -124,7 +126,11 @@ Acceptable comment characteristics:
 
 =item  USER_IP
 
-The B<only required> item.  Represents the IP address of the comment submitter.
+B<Required.>  Represents the IP address of the comment submitter.
+
+=item  COMMENT_USER_AGENT
+
+B<Required.>  User agent string from the comment submitter's request.
 
 =item  COMMENT_CONTENT
 
@@ -208,14 +214,14 @@ sub _submit {
 
 	my $comment = shift;
 
-	$comment->{USER_IP} 	|| return undef;
+	$comment->{USER_IP} && $comment->{COMMENT_USER_AGENT} || return undef;
 
 	my $response = $self->{ua}->request(
     	POST "http://$self->{KEY}.rest.akismet.com/1.1/$action",
             [
                 blog 					=> $self->{URL},
 				user_ip					=> $comment->{USER_IP},
-				user_agent				=> $self->{ua}->agent(),
+				user_agent				=> $comment->{COMMENT_USER_AGENT},
 				referrer				=> $comment->{REFERRER},
 				permalink				=> $comment->{PERMALINK},
 				comment_type			=> $comment->{COMMENT_TYPE},
@@ -255,12 +261,22 @@ Although almost all comment characteristics are optional, performance can drop d
 
 Nikolay Bachiyski E<lt>nbachiyski@developer.bgE<gt>
 
+=head2 Help, modifications and bugfixes from:
+
+=over 4
+
+=item * Peter Pentchev
+
+=item * John Belmonte 
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Nikolay Bachiyski
+Copyright (C) 2006, 2007 by Nikolay Bachiyski
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, any later version of Perl 5 you may have available.
 
-$Id: Akismet.pm 28 2006-07-02 20:35:17Z humperdink $
+$Id: Akismet.pm 32 2007-08-27 07:21:34Z humperdink $
 
 =cut
