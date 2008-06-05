@@ -14,7 +14,7 @@ use integer;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION	= '0.04';
+our $VERSION	= '0.05';
 
 my $UA_SUFFIX	= "Perl-Net-Akismet/$VERSION";
 
@@ -66,6 +66,14 @@ If supplied the value is prepended to this module's identification string to bec
 	your-killer-app/0.042 Perl-Net-Akismet/0.01 libwww-perl/5.8
 
 Otherwise just Akismet Perl's user agent string will be sent.
+
+=item	SERVICE_HOST
+
+If supplied, the host of the service API. The default is rest.akismet.com
+
+=item	SERVICE_VERSION
+
+If supplied, the API version. The default is 1.1
 
 =back
 
@@ -282,6 +290,6 @@ Copyright (C) 2006, 2007, 2008 by Nikolay Bachiyski
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, any later version of Perl 5 you may have available.
 
-$Id: Akismet.pm 35 2008-06-05 16:56:42Z humperdink $
+$Id: Akismet.pm 38 2008-06-05 17:15:12Z humperdink $
 
 =cut
