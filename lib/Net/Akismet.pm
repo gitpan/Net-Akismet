@@ -14,7 +14,7 @@ use integer;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION	= '0.03';
+our $VERSION	= '0.04';
 
 my $UA_SUFFIX	= "Perl-Net-Akismet/$VERSION";
 
@@ -26,11 +26,11 @@ my $UA_SUFFIX	= "Perl-Net-Akismet/$VERSION";
 		) or die('Key verification failure!');
 
 	my $verdict = $akismet->check(
-			USER_IP 		=> '10.10.10.11',
-			USER_AGENT 		=> 'Mozilla/5.0',
+			USER_IP 			=> '10.10.10.11',
+			COMMENT_USER_AGENT 	=> 'Mozilla/5.0',
 			COMMENT_CONTENT		=> 'Run, Lola, Run, the spam will catch you!',
 			COMMENT_AUTHOR		=> 'dosser',
-			COMENT_AUTHOR_EMAIL	=> 'dosser@subway.de',
+			COMMENT_AUTHOR_EMAIL	=> 'dosser@subway.de',
 			REFERRER		=> 'http://lola.home/',
 		) or die('Is the server here?');
 
@@ -91,6 +91,9 @@ sub new {
 	$agent = "$params{USER_AGENT} $agent" if $params{USER_AGENT};
 	$self->{ua}->agent($agent);
 
+	$self->{SERVICE_HOST} = $params{SERVICE_HOST} || 'rest.akismet.com';
+	$self->{SERVICE_VERSION} = $params{SERVICE_VERSION} || '1.1';
+
 	bless $self, $class;
 
 	return $self->_verify_key()? $self : undef;
@@ -100,9 +103,8 @@ sub _verify_key {
 
 	my $self 	= shift;
 
-
 	my $response = $self->{ua}->request(
-			POST 'http://rest.akismet.com/1.1/verify-key', 
+			POST "http://$self->{SERVICE_HOST}/$self->{SERVICE_VERSION}/verify-key", 
 			[
 				key		=> $self->{KEY},
 				blog 	=> $self->{URL},
@@ -216,8 +218,11 @@ sub _submit {
 
 	$comment->{USER_IP} && $comment->{COMMENT_USER_AGENT} || return undef;
 
+	# accomodate common misspelling
+	$comment->{REFERRER} = $comment->{REFERER} if !$comment->{REFERRER} && $comment->{REFERER};
+
 	my $response = $self->{ua}->request(
-    	POST "http://$self->{KEY}.rest.akismet.com/1.1/$action",
+    	POST "http://$self->{KEY}.$self->{SERVICE_HOST}/$self->{SERVICE_VERSION}/$action",
             [
                 blog 					=> $self->{URL},
 				user_ip					=> $comment->{USER_IP},
@@ -259,7 +264,7 @@ Although almost all comment characteristics are optional, performance can drop d
 
 =head1 AUTHOR
 
-Nikolay Bachiyski E<lt>nbachiyski@developer.bgE<gt>
+Nikolay Bachiyski E<lt>nb@nikolay.bgE<gt>
 
 =head2 Help, modifications and bugfixes from:
 
@@ -273,10 +278,10 @@ Nikolay Bachiyski E<lt>nbachiyski@developer.bgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006, 2007 by Nikolay Bachiyski
+Copyright (C) 2006, 2007, 2008 by Nikolay Bachiyski
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.7 or, at your option, any later version of Perl 5 you may have available.
 
-$Id: Akismet.pm 32 2007-08-27 07:21:34Z humperdink $
+$Id: Akismet.pm 35 2008-06-05 16:56:42Z humperdink $
 
 =cut
